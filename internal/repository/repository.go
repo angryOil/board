@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"board/internal/domain"
 	"board/internal/repository/model"
 	"board/internal/repository/req"
 	"context"
@@ -40,4 +41,46 @@ func (r Repository) Delete(ctx context.Context, id int) error {
 		return errors.New(InternalServerError)
 	}
 	return err
+}
+
+func (r Repository) Patch(ctx context.Context, id int,
+	validFunc func(domains []domain.Board) (domain.Board, error),
+	updateFunc func(d domain.Board) (req.Patch, error)) error {
+
+	var models []model.Board
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		log.Println("Patch begin tx err: ", err)
+		return errors.New(InternalServerError)
+	}
+	err = tx.NewSelect().Model(&models).Where("id = ?", id).Scan(ctx)
+	if err != nil {
+		log.Println("Patch NewSelect err: ", err)
+		return errors.New(InternalServerError)
+	}
+
+	findDomains := model.ToDomainList(models)
+
+	validDomain, err := validFunc(findDomains)
+	if err != nil {
+		return err
+	}
+	updateDto, err := updateFunc(validDomain)
+	if err != nil {
+		return err
+	}
+	m := model.ToUpdateModel(updateDto)
+
+	_, err = tx.NewInsert().Model(&m).On("conflict (id) do update").Exec(ctx)
+	if err != nil {
+		log.Println("Patch NewInsert err: ", err)
+		return errors.New(InternalServerError)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		log.Println("Patch commit err: ", err)
+		return errors.New(InternalServerError)
+	}
+	return nil
 }

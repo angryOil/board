@@ -21,6 +21,7 @@ func NewHandler(c controller.Controller) http.Handler {
 	// query 로 최신순,boardType,writer 검색을 넣을거임
 	r.HandleFunc("/boards/{cafeId:[0-9]+}/{boardType:[0-9]+}", h.getList).Methods(http.MethodGet)
 	r.HandleFunc("/boards/{cafeId:[0-9]+}/{boardType:[0-9]+}", h.create).Methods(http.MethodPost)
+	r.HandleFunc("/boards/{id:[0-9]+}", h.patch).Methods(http.MethodPatch)
 	r.HandleFunc("/boards/{id:[0-9]+}", h.delete).Methods(http.MethodDelete)
 	return r
 }
@@ -79,6 +80,28 @@ func (h Handler) delete(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h Handler) patch(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, InvalidBoardId, http.StatusBadRequest)
+		return
+	}
+
+	var dto req.Patch
+	err = json.NewDecoder(r.Body).Decode(&dto)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = h.c.Patch(r.Context(), id, dto)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 }

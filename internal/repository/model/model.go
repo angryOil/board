@@ -1,6 +1,7 @@
 package model
 
 import (
+	"board/internal/domain"
 	"board/internal/repository/req"
 	"github.com/uptrace/bun"
 	"time"
@@ -28,4 +29,38 @@ func ToCreateModel(c req.Create) Board {
 		Content:   c.Content,
 		CreatedAt: c.CreatedAt,
 	}
+}
+
+func ToUpdateModel(u req.Patch) Board {
+	return Board{
+		Id:            u.Id,
+		CafeId:        u.CafeId,
+		BoardType:     u.BoardType,
+		Writer:        u.Writer,
+		Title:         u.Title,
+		Content:       u.Content,
+		CreatedAt:     u.CreatedAt,
+		LastUpdatedAt: u.UpdatedAt,
+	}
+}
+
+func (m Board) ToDomain() domain.Board {
+	return domain.NewBuilder().
+		Id(m.Id).
+		Writer(m.Writer).
+		CafeId(m.CafeId).
+		BoardType(m.BoardType).
+		Title(m.Title).
+		Content(m.Content).
+		CreatedAt(m.CreatedAt).
+		LastUpdatedAt(m.LastUpdatedAt).
+		Build()
+}
+
+func ToDomainList(models []Board) []domain.Board {
+	result := make([]domain.Board, len(models))
+	for i, m := range models {
+		result[i] = m.ToDomain()
+	}
+	return result
 }

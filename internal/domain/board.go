@@ -16,6 +16,7 @@ type Board interface {
 
 	ToListInfo() vo.ListInfo // 리스트 (간단 정보)
 	ToDetail() vo.Detail     // 상세정보 (내용 포함)
+	ToUpdate() vo.Update
 }
 
 type board struct {
@@ -86,6 +87,7 @@ func (b *board) Update(title, content string) (Board, error) {
 	}
 	b.title = title
 	b.content = content
+	b.lastUpdatedAt = time.Now()
 	err := b.ValidUpdate()
 	if err != nil {
 		return b, err
@@ -107,6 +109,19 @@ func (b *board) ToListInfo() vo.ListInfo {
 func (b *board) ToDetail() vo.Detail {
 	return vo.Detail{
 		Id:            b.id,
+		BoardType:     b.boardType,
+		Writer:        b.writer,
+		Title:         b.title,
+		Content:       b.content,
+		CreatedAt:     b.createdAt,
+		LastUpdatedAt: b.lastUpdatedAt,
+	}
+}
+
+func (b *board) ToUpdate() vo.Update {
+	return vo.Update{
+		Id:            b.id,
+		CafeId:        b.cafeId,
 		BoardType:     b.boardType,
 		Writer:        b.writer,
 		Title:         b.title,
