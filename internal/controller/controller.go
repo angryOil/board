@@ -25,3 +25,8 @@ func (c Controller) Create(ctx context.Context, cafeId int, boardType int, dto r
 	})
 	return err
 }
+
+func (c Controller) Delete(ctx context.Context, id int) error {
+	err := c.s.Delete(ctx, id)
+	return err
+}

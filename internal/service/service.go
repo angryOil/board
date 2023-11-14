@@ -44,3 +44,8 @@ func (s Service) Create(ctx context.Context, c req2.Create) error {
 	})
 	return err
 }
+
+func (s Service) Delete(ctx context.Context, id int) error {
+	err := s.repo.Delete(ctx, id)
+	return err
+}

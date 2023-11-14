@@ -31,3 +31,13 @@ func (r Repository) Create(ctx context.Context, c req.Create) error {
 	}
 	return nil
 }
+
+func (r Repository) Delete(ctx context.Context, id int) error {
+	var m model.Board
+	_, err := r.db.NewDelete().Model(&m).Where("id = ?", id).Exec(ctx)
+	if err != nil {
+		log.Println("Delete NewDelete err: ", err)
+		return errors.New(InternalServerError)
+	}
+	return err
+}
