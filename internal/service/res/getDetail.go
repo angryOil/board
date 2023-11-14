@@ -1,6 +1,6 @@
-package vo
+package res
 
-type Detail struct {
+type GetDetail struct {
 	Id            int
 	BoardType     int
 	Writer        int

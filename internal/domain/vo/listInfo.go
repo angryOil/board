@@ -1,11 +1,10 @@
 package vo
 
-type Detail struct {
+type ListInfo struct {
 	Id            int
 	BoardType     int
 	Writer        int
 	Title         string
-	Content       string
 	CreatedAt     string
 	LastUpdatedAt string
 }

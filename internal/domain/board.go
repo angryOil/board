@@ -16,6 +16,7 @@ type Board interface {
 
 	ToListInfo() vo.ListInfo // 리스트 (간단 정보)
 	ToDetail() vo.Detail     // 상세정보 (내용 포함)
+	ToUpdate() vo.Update
 }
 
 type board struct {
@@ -86,6 +87,7 @@ func (b *board) Update(title, content string) (Board, error) {
 	}
 	b.title = title
 	b.content = content
+	b.lastUpdatedAt = time.Now()
 	err := b.ValidUpdate()
 	if err != nil {
 		return b, err
@@ -99,8 +101,8 @@ func (b *board) ToListInfo() vo.ListInfo {
 		BoardType:     b.boardType,
 		Writer:        b.writer,
 		Title:         b.title,
-		CreatedAt:     b.createdAt,
-		LastUpdatedAt: b.lastUpdatedAt,
+		CreatedAt:     convertTimeToString(b.createdAt),
+		LastUpdatedAt: convertTimeToString(b.lastUpdatedAt),
 	}
 }
 
@@ -111,7 +113,30 @@ func (b *board) ToDetail() vo.Detail {
 		Writer:        b.writer,
 		Title:         b.title,
 		Content:       b.content,
+		CreatedAt:     convertTimeToString(b.createdAt),
+		LastUpdatedAt: convertTimeToString(b.lastUpdatedAt),
+	}
+}
+
+func (b *board) ToUpdate() vo.Update {
+	return vo.Update{
+		Id:            b.id,
+		CafeId:        b.cafeId,
+		BoardType:     b.boardType,
+		Writer:        b.writer,
+		Title:         b.title,
+		Content:       b.content,
 		CreatedAt:     b.createdAt,
 		LastUpdatedAt: b.lastUpdatedAt,
 	}
+}
+
+var koreaZone, _ = time.LoadLocation("Asia/Seoul")
+
+func convertTimeToString(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	t = t.In(koreaZone)
+	return t.Format(time.RFC3339)
 }
