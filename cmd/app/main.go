@@ -14,7 +14,7 @@ func main() {
 	r := mux.NewRouter()
 	h := getHandler()
 
-	r.PathPrefix("/board/{cafeId:[0-9]+}").Handler(h)
+	r.PathPrefix("/boards/{cafeId:[0-9]+}").Handler(h)
 
 	err := http.ListenAndServe(":8089", r)
 	if err != nil {
