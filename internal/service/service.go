@@ -5,6 +5,7 @@ import (
 	"board/internal/repository"
 	"board/internal/repository/req"
 	req2 "board/internal/service/req"
+	"board/internal/service/res"
 	"context"
 	"errors"
 	"time"
@@ -85,4 +86,24 @@ func (s Service) Patch(ctx context.Context, p req2.Patch) error {
 		},
 	)
 	return err
+}
+
+func (s Service) GetDetail(ctx context.Context, id int) (res.GetDetail, error) {
+	domains, err := s.repo.GetDetail(ctx, id)
+	if err != nil {
+		return res.GetDetail{}, err
+	}
+	if len(domains) != 1 {
+		return res.GetDetail{}, nil
+	}
+	v := domains[0].ToDetail()
+	return res.GetDetail{
+		Id:            v.Id,
+		BoardType:     v.BoardType,
+		Writer:        v.Writer,
+		Title:         v.Title,
+		Content:       v.Content,
+		CreatedAt:     v.CreatedAt,
+		LastUpdatedAt: v.LastUpdatedAt,
+	}, nil
 }

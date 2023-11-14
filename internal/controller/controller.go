@@ -2,6 +2,7 @@ package controller
 
 import (
 	"board/internal/controller/req"
+	"board/internal/controller/res"
 	"board/internal/service"
 	req2 "board/internal/service/req"
 	"context"
@@ -38,4 +39,20 @@ func (c Controller) Patch(ctx context.Context, id int, p req.Patch) error {
 		Content: p.Content,
 	})
 	return err
+}
+
+func (c Controller) GetDetail(ctx context.Context, id int) (res.Detail, error) {
+	d, err := c.s.GetDetail(ctx, id)
+	if err != nil {
+		return res.Detail{}, err
+	}
+	return res.Detail{
+		Id:            d.Id,
+		BoardType:     d.BoardType,
+		Writer:        d.Writer,
+		Title:         d.Title,
+		Content:       d.Content,
+		CreatedAt:     d.CreatedAt,
+		LastUpdatedAt: d.LastUpdatedAt,
+	}, nil
 }

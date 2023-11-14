@@ -1,10 +1,11 @@
-package vo
+package res
 
-type ListInfo struct {
+type GetDetail struct {
 	Id            int
 	BoardType     int
 	Writer        int
 	Title         string
+	Content       string
 	CreatedAt     string
 	LastUpdatedAt string
 }

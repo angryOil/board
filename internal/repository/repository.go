@@ -84,3 +84,13 @@ func (r Repository) Patch(ctx context.Context, id int,
 	}
 	return nil
 }
+
+func (r Repository) GetDetail(ctx context.Context, id int) ([]domain.Board, error) {
+	var models []model.Board
+	err := r.db.NewSelect().Model(&models).Where("id = ?", id).Scan(ctx)
+	if err != nil {
+		log.Println("GetDetail NewSelect err: ", err)
+		return []domain.Board{}, errors.New(InternalServerError)
+	}
+	return model.ToDomainList(models), nil
+}

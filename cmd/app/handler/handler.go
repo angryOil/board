@@ -5,6 +5,7 @@ import (
 	"board/internal/controller/req"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -27,13 +28,32 @@ func NewHandler(c controller.Controller) http.Handler {
 }
 
 const (
-	InvalidCafeId    = "invalid cafe id"
-	InvalidBoardType = "invalid board type"
-	InvalidBoardId   = "invalid board id"
+	InvalidCafeId       = "invalid cafe id"
+	InvalidBoardType    = "invalid board type"
+	InvalidBoardId      = "invalid board id"
+	InternalServerError = "internal server error"
 )
 
 func (h Handler) getDetail(w http.ResponseWriter, r *http.Request) {
-
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, InvalidBoardId, http.StatusBadRequest)
+		return
+	}
+	detail, err := h.c.GetDetail(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data, err := json.Marshal(detail)
+	if err != nil {
+		log.Println("getDetail json.Marshal err: ", err)
+		http.Error(w, InternalServerError, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(data)
 }
 func (h Handler) getList(w http.ResponseWriter, r *http.Request) {
 

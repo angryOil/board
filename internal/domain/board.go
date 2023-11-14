@@ -101,8 +101,8 @@ func (b *board) ToListInfo() vo.ListInfo {
 		BoardType:     b.boardType,
 		Writer:        b.writer,
 		Title:         b.title,
-		CreatedAt:     b.createdAt,
-		LastUpdatedAt: b.lastUpdatedAt,
+		CreatedAt:     convertTimeToString(b.createdAt),
+		LastUpdatedAt: convertTimeToString(b.lastUpdatedAt),
 	}
 }
 
@@ -113,8 +113,8 @@ func (b *board) ToDetail() vo.Detail {
 		Writer:        b.writer,
 		Title:         b.title,
 		Content:       b.content,
-		CreatedAt:     b.createdAt,
-		LastUpdatedAt: b.lastUpdatedAt,
+		CreatedAt:     convertTimeToString(b.createdAt),
+		LastUpdatedAt: convertTimeToString(b.lastUpdatedAt),
 	}
 }
 
@@ -129,4 +129,14 @@ func (b *board) ToUpdate() vo.Update {
 		CreatedAt:     b.createdAt,
 		LastUpdatedAt: b.lastUpdatedAt,
 	}
+}
+
+var koreaZone, _ = time.LoadLocation("Asia/Seoul")
+
+func convertTimeToString(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	t = t.In(koreaZone)
+	return t.Format(time.RFC3339)
 }
