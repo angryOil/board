@@ -2,6 +2,7 @@ package service
 
 import (
 	"board/internal/domain"
+	page2 "board/internal/page"
 	"board/internal/repository"
 	"board/internal/repository/req"
 	req2 "board/internal/service/req"
@@ -106,4 +107,24 @@ func (s Service) GetDetail(ctx context.Context, id int) (res.GetDetail, error) {
 		CreatedAt:     v.CreatedAt,
 		LastUpdatedAt: v.LastUpdatedAt,
 	}, nil
+}
+
+func (s Service) GetListTotal(ctx context.Context, cafeId int, boardType int, writer int, reqPage page2.ReqPage) ([]res.Info, int, error) {
+	domains, total, err := s.repo.GetListTotal(ctx, cafeId, boardType, writer, reqPage)
+	if err != nil {
+		return []res.Info{}, 0, err
+	}
+	dto := make([]res.Info, len(domains))
+	for i, d := range domains {
+		v := d.ToListInfo()
+		dto[i] = res.Info{
+			Id:            v.Id,
+			BoardType:     v.BoardType,
+			Writer:        v.Writer,
+			Title:         v.Title,
+			CreatedAt:     v.CreatedAt,
+			LastUpdatedAt: v.LastUpdatedAt,
+		}
+	}
+	return dto, total, err
 }

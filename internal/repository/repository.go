@@ -2,6 +2,7 @@ package repository
 
 import (
 	"board/internal/domain"
+	page2 "board/internal/page"
 	"board/internal/repository/model"
 	"board/internal/repository/req"
 	"context"
@@ -93,4 +94,23 @@ func (r Repository) GetDetail(ctx context.Context, id int) ([]domain.Board, erro
 		return []domain.Board{}, errors.New(InternalServerError)
 	}
 	return model.ToDomainList(models), nil
+}
+
+func (r Repository) GetListTotal(ctx context.Context, cafeId int, boardType int, writer int, reqPage page2.ReqPage) ([]domain.Board, int, error) {
+	var models []model.Board
+	cnt, err := r.db.NewSelect().Model(&models).Where("cafe_id = ?", cafeId).WhereGroup("and", func(q *bun.SelectQuery) *bun.SelectQuery {
+		if boardType > 0 {
+			q = q.Where("board_type = ?", boardType)
+		}
+		if writer > 0 {
+			q = q.Where("writer = ?", writer)
+		}
+		return q
+	}).Offset(reqPage.Offset).Limit(reqPage.Size).ScanAndCount(ctx)
+
+	if err != nil {
+		log.Println("GetListTotal NewSelect err: ", err)
+		return []domain.Board{}, 0, errors.New(InternalServerError)
+	}
+	return model.ToDomainList(models), cnt, nil
 }
