@@ -35,9 +35,10 @@ func (c Controller) Delete(ctx context.Context, id int) error {
 
 func (c Controller) Patch(ctx context.Context, id int, p req.Patch) error {
 	err := c.s.Patch(ctx, req2.Patch{
-		Id:      id,
-		Title:   p.Title,
-		Content: p.Content,
+		Id:        id,
+		Requester: p.Requester,
+		Title:     p.Title,
+		Content:   p.Content,
 	})
 	return err
 }

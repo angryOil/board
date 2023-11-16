@@ -44,7 +44,7 @@ func (r Repository) Delete(ctx context.Context, id int) error {
 	return err
 }
 
-func (r Repository) Patch(ctx context.Context, id int,
+func (r Repository) Patch(ctx context.Context, id int, requester int,
 	validFunc func(domains []domain.Board) (domain.Board, error),
 	updateFunc func(d domain.Board) (req.Patch, error)) error {
 
@@ -54,7 +54,7 @@ func (r Repository) Patch(ctx context.Context, id int,
 		log.Println("Patch begin tx err: ", err)
 		return errors.New(InternalServerError)
 	}
-	err = tx.NewSelect().Model(&models).Where("id = ?", id).Scan(ctx)
+	err = tx.NewSelect().Model(&models).Where("id = ? and writer = ?", id, requester).Scan(ctx)
 	if err != nil {
 		log.Println("Patch NewSelect err: ", err)
 		return errors.New(InternalServerError)

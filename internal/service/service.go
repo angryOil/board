@@ -61,7 +61,7 @@ func (s Service) Patch(ctx context.Context, p req2.Patch) error {
 	id := p.Id
 	title, content := p.Title, p.Content
 
-	err := s.repo.Patch(ctx, id,
+	err := s.repo.Patch(ctx, id, p.Requester,
 		func(domains []domain.Board) (domain.Board, error) {
 			if len(domains) != 1 {
 				return domain.NewBuilder().Build(), errors.New(BoardNotFound)
